@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MedTime - Invitación</title>
+    <script>
+        // Obtener el UID de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid');
+        
+        if (uid) {
+            // Intentar abrir la app
+            window.location.href = `medtime://invite?uid=${uid}`;
+            
+            // Si la app no está instalada, mostrar mensaje después de 2 segundos
+            setTimeout(() => {
+                document.getElementById('message').innerHTML = 
+                    '<h2>¿No tienes MedTime instalada?</h2>' +
+                    '<p>Descarga la app para recibir las alertas.</p>';
+            }, 2000);
+        }
+    </script>
+</head>
+<body style="font-family: Arial; text-align: center; padding: 50px;">
+    <h1>🔗 Abriendo MedTime...</h1>
+    <div id="message">
+        <p>Si la app no se abre automáticamente, asegúrate de tenerla instalada.</p>
+    </div>
+</body>
+</html>
