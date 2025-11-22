@@ -1,30 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedTime - Invitación</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .uid-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #999;
+            word-break: break-all;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+            display: none;
+        }
+        .status.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">💊</div>
+        <h1 id="title">Vinculación MedTime</h1>
+        <p id="message">Toca el botón para abrir la app y recibir alertas de medicamentos.</p>
+        
+        <button class="btn" id="openBtn" onclick="openApp()">
+            🚀 Abrir MedTime
+        </button>
+        
+        <div class="status" id="status"></div>
+        <div class="uid-info" id="uidInfo"></div>
+    </div>
+
     <script>
-        // Obtener el UID de la URL
         const urlParams = new URLSearchParams(window.location.search);
         const uid = urlParams.get('uid');
         
-        if (uid) {
-            // Intentar abrir la app
-            window.location.href = `medtime://invite?uid=${uid}`;
+        function showStatus(msg) {
+            const status = document.getElementById('status');
+            status.textContent = msg;
+            status.classList.add('show');
+        }
+        
+        function openApp() {
+            if (!uid) {
+                showStatus('❌ Error: No se encontró el código de usuario');
+                return;
+            }
             
-            // Si la app no está instalada, mostrar mensaje después de 2 segundos
+            const deepLink = `medtime://invite?uid=${uid}`;
+            showStatus('🔄 Abriendo MedTime...');
+            
+            // Crear un iframe oculto para intentar abrir la app
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = deepLink;
+            document.body.appendChild(iframe);
+            
+            // También intentar con window.location como fallback
             setTimeout(() => {
-                document.getElementById('message').innerHTML = 
-                    '<h2>¿No tienes MedTime instalada?</h2>' +
-                    '<p>Descarga la app para recibir las alertas.</p>';
+                window.location.href = deepLink;
+            }, 100);
+            
+            // Mensaje después de 2 segundos
+            setTimeout(() => {
+                showStatus('💡 Si la app no se abrió, asegúrate de tenerla instalada');
             }, 2000);
         }
+        
+        // Configurar la página según el UID
+        if (uid) {
+            document.getElementById('uidInfo').innerHTML = 
+                '<strong>Código de vinculación:</strong><br>' + uid;
+            
+            // Intento automático al cargar (algunos navegadores lo permiten)
+            setTimeout(openApp, 500);
+        } else {
+            document.getElementById('title').textContent = '⚠️ Link Inválido';
+            document.getElementById('message').textContent = 
+                'Este enlace no contiene un código de usuario válido.';
+            document.getElementById('openBtn').style.display = 'none';
+        }
     </script>
-</head>
-<body style="font-family: Arial; text-align: center; padding: 50px;">
-    <h1>🔗 Abriendo MedTime...</h1>
-    <div id="message">
-        <p>Si la app no se abre automáticamente, asegúrate de tenerla instalada.</p>
-    </div>
 </body>
 </html>
